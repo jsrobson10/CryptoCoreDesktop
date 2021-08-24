@@ -1,0 +1,243 @@
+
+html
+{
+    user-select: none;
+    background-color: #31333c;
+    color: #eaeaef;
+    margin: 0;
+}
+
+img
+{
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-drag: none;
+	-webkit-user-drag: none;
+}
+
+.AddressRow
+{
+	margin: 0;
+	width: 400px;
+}
+
+.QRCode
+{
+	padding: 8px;
+	border-radius: 4px;
+	background-color: #eaeaef;
+	display: inline-block;
+}
+
+.WalletRightSide
+{
+	position: absolute;
+	right: 20px;
+	top: 20px;
+}
+
+.Button
+{
+    display: block;
+    padding: 16px;
+    display: block;
+    background-color: #333641;
+	transition: 0.2s;
+}
+
+.Button:hover
+{
+    background-color: #41434d;
+    cursor: pointer;
+}
+
+.Button.Selected
+{
+    background-color: #41434d;
+}
+
+.Button.Selected:hover
+{
+    background-color: #474a55;
+}
+
+.Button p
+{
+    margin: 0;
+}
+
+.WalletMenu
+{
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 280px;
+    position: fixed;
+    background-color: #333641;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#HoverMenu .Box
+{
+	top: 60px;
+	bottom: 60px;
+	left: 60px;
+	right: 60px;
+	position: fixed;
+    background-color: #393c49;
+	overflow-y: auto;
+	overflow-x: hidden;
+	border-radius: 4px;
+	z-index: 11;
+	padding: 32px;
+}
+
+#HoverMenu .Overlay
+{
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 0.5;
+	background-color: #000000;
+	z-index: 10;
+	position: fixed;
+}
+
+::-webkit-scrollbar
+{
+    background-color: #393b43;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background-color: #555761;
+}
+
+#MainMenu 
+{
+    margin-left: 300px;
+	margin-right: 280px;
+    padding: 10px;
+}
+
+h1, p
+{
+    font-family: "Roboto", sans-serif;
+    font-style: normal;
+    font-weight: lighter;
+}
+
+h1
+{
+    font-size: 20px;
+}
+
+p
+{
+    font-size: 15px;
+}
+
+code
+{
+	font-size: 12px;
+	user-select: text;
+}
+
+.Info
+{
+	margin: 0;
+	font-size: 12px;
+}
+
+.WalletInfoText
+{
+	text-align: right;
+}
+
+.Transaction
+{
+	padding: 12px;
+	margin: 8px 0;
+    background-color: #41434d;
+	border-radius: 6px;
+	transition: 0.2s;
+	width: 600px;
+}
+
+.Transaction:hover
+{
+    background-color: #474a55;
+    cursor: pointer;
+}
+
+.Transaction.Spend
+{
+    background-color: #51434d;
+}
+
+.Transaction.Receive
+{
+    background-color: #41534d;
+}
+
+.Transaction.Spend:hover
+{
+    background-color: #574a55;
+}
+
+.Transaction.Receive:hover
+{
+    background-color: #475a55;
+}
+
+.Transaction p
+{
+	margin: 0;
+}
+
+input[type=text], input[type=password], input[type=number], select, textarea
+{
+	padding: 4px;
+	border-radius: 4px;
+	border-width: 1px;
+	background-color: #eaeaef;
+	width: 100%;
+}
+
+button
+{
+	padding: 8px;
+	margin: 0;
+    background-color: #41434d;
+	border-radius: 4px;
+	border-width: 1px;
+	transition: 0.2s;
+    color: #eaeaef;
+}
+
+button:hover
+{
+    background-color: #474a55;
+    cursor: pointer;
+}
+
+input, select, textarea
+{
+	border-width: 1px;
+}
+
+#RecentTransactionsChart
+{
+	width: 200px;
+	height: 160px;
+	background-color: #eaeaef;
+	border-radius: 4px;
+	padding: 8px;
+}
+
