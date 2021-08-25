@@ -9,7 +9,6 @@ let adjectives = [];
 let nouns = [];
 let wallet_selected_e = undefined;
 let wallet_selected = undefined;
-let transactions = [];
 let password = "";
 let salt = "";
 
@@ -183,6 +182,8 @@ async function form_send_transaction()
 
 		for(let e of form_send_out)
 		{
+			if(!e) continue;
+
 			let address = e.querySelector("#Form-Address").value;
 			let amount = e.querySelector("#Form-Amount").value;
 			let msg = e.querySelector("#Form-Message").value;
@@ -251,30 +252,30 @@ async function form_send_transaction()
 
 		if(seconds < 60)
 		{
-			time_str = `${(seconds, 0).toFixed(0)} seconds remaining`;
+			time_str = `${(seconds).toFixed(0)} seconds remaining`;
 		}
 
 		else if(seconds < 3600)
 		{
-			time_str = `${(seconds / 60, 0).toFixed(0)} minutes remaining`;
+			time_str = `${(seconds / 60).toFixed(0)} minutes ${(seconds % 60).toFixed(0)} seconds remaining`;
 		}
 
 		else if(seconds < 86400)
 		{
-			time_str = `${(seconds / 3600, 0).toFixed(0)} hours remaining`;
+			time_str = `${(seconds / 3600).toFixed(0)} hours ${((seconds % 3600) / 60).toFixed(0)} minutes remaining`;
 		}
 
 		else if(seconds < 2592000)
 		{
-			time_str = `${(seconds / 86400).toFixed(0)} days rmaining`;
+			time_str = `${(seconds / 86400).toFixed(0)} days ${((seconds % 86400) / 3600).toFixed(0)} hours rmaining`;
 		}
 
 		else
 		{
-			time_str = `${(seconds / 2592000).toFixed(0)} years remaining`;
+			time_str = `${(seconds / 2592000).toFixed(0)} years ${((seconds % 2592000) / 86400).toFixed(0)} days remaining`;
 		}
 		
-		document.getElementById("Form-Eta").innerHTML = sanitize_text(time_str);
+		document.getElementById("Form-Eta").innerHTML = sanitize_text(`${time_str} at ${res.hashrate} H/s`);
 	};
 
 	setTimeout(() => {update()}, 1000);
@@ -294,6 +295,8 @@ async function form_send_transaction()
 		document.getElementById("Form-Submit").disabled = false;
 		return;
 	}
+	
+	await update_wallets();
 	
 	close_popup();
 }
@@ -377,11 +380,59 @@ function create_export_popup_window()
 	});
 }
 
+async function update_wallets()
+{
+	let addresses = []
+	
+	for(let wallet of wallets)
+	{
+		addresses.push_back(wallet.address)
+	}
+
+	let res = await communication.list_transactions(addresses);
+	
+	for(let tx of addresses)
+	{
+		for(let wallet of wallets)
+		{
+			if(wallet.address === tx.address)
+			{
+				let found = false;
+
+				for(let htx of wallet.history)
+				{
+					if(htx.txid === tx.txid)
+					{
+						found = true;
+
+						break;
+					}
+				}
+
+				if(!found)
+				{
+					wallet.history.shift(tx);
+					
+					if(tx.type === "receive")
+					{
+						wallet.balance += BigInt(tx.amount);
+					}
+
+					else if(tx.type === "send")
+					{
+						wallet.balance -= BigInt(tx.amount);
+					}
+				}
+			}
+		}
+	}
+}
+
 function view_transaction(txid)
 {
 	let tx = undefined;
 	
-	for(let c of transactions)
+	for(let c of wallet_selected.history)
 	{
 		if(c.txid === txid)
 		{
@@ -547,6 +598,12 @@ async function load_wallet_fs(create=false)
 			{
 				let wallet = await communication.get_wallet(raw_wallet.prikey);
 				let info = await communication.get_address_info(wallet.address);
+				let transactions = (await communication.list_transactions([wallet.address]))["transactions"];
+	
+				if(!transactions)
+				{
+					transactions = [];
+				}
 				
 				wallets.push(
 				{
@@ -554,6 +611,7 @@ async function load_wallet_fs(create=false)
 					prikey: wallet.prikey,
 					address: wallet.address,
 					balance: info.balance,
+					history: transactions,
 				});
 			}
 		}
@@ -598,6 +656,8 @@ async function load_wallet_fs(create=false)
 	{
 		select_wallet(0);
 	}
+	
+	setInterval(() => {update_wallets()}, 5000);
 }
 
 function initialize_fs()
@@ -674,13 +734,6 @@ async function select_wallet(i)
 	wallet_selected = wallets[i];
 	wallet_selected_e = e;
 	
-	transactions = (await communication.list_transactions([wallet_selected.address]))["transactions"];
-	
-	if(!transactions)
-	{
-		transactions = [];
-	}
-
 	display_wallet();
 }
 
@@ -754,7 +807,7 @@ function display_wallet()
 	let it = 0;
 
 	// display the transactions
-	for(let tx of transactions)
+	for(let tx of wallet_selected.history)
 	{
 		let msg = "";
 		let address = "";
@@ -998,6 +1051,12 @@ async function add_new_wallet()
 	}
 
 	let info = await communication.get_address_info(wallet.address);
+	let transactions = (await communication.list_transactions([wallet.address]))["transactions"];
+	
+	if(!transactions)
+	{
+		transactions = [];
+	}
 	
 	wallets.push(
 	{
@@ -1005,6 +1064,7 @@ async function add_new_wallet()
 		prikey: wallet.prikey,
 		address: wallet.address,
 		balance: info.balance,
+		history: transactions,
 	});
 
 	update_wallet_buttons();
